@@ -8,12 +8,12 @@ class ConvBlock(nn.Module):
         
         if final:
             self.block = nn.Sequential(
-                nn.Conv2d(in_channels=inChannels, out_channels=outChannels, padding=1),
+                nn.Conv2d(in_channels=inChannels, out_channels=outChannels, kernel_size=3, stride=1, padding=1),
                 nn.Sigmoid()
             )
         else:
             self.block = nn.Sequential(
-                nn.Conv2d(in_channels=inChannels, out_channels=outChannels, stride=1, padding=1),
+                nn.Conv2d(in_channels=inChannels, out_channels=outChannels, kernel_size=3, stride=1, padding=1),
                 nn.BatchNorm2d(outChannels, eps=1e-5, momentum=0.05, affine=True),
                 nn.ReLU(inplace=True)
             )
@@ -23,7 +23,7 @@ class ConvBlock(nn.Module):
     
 class DownSampleBlock(nn.Module):
     def __init__(self, kernel_size=2 , stride=2):
-        super().__init__(kernel_size, stride)
+        super().__init__()
         self.maxpool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride)
 
     def forward(self, x):
@@ -31,7 +31,7 @@ class DownSampleBlock(nn.Module):
     
 class UpSampleBlock(nn.Module):
     def __init__(self, scale_factor=2 , mode="bilinear", align_corners=False):
-        super().__init__(scale_factor, mode, align_corners)
+        super().__init__()
         self.upscale = nn.Upsample(
             scale_factor=scale_factor,
             mode=mode,
