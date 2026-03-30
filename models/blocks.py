@@ -41,3 +41,48 @@ class UpSampleBlock(nn.Module):
     def forward(self, x):
         return self.upscale(x)
     
+class PreActBlock(nn.Module):
+    expansion = 1
+    def __init__(self, in_planes, planes, stride=1):
+        super().__init__()
+
+        self.batch_norm1 = nn.BatchNorm2d(in_planes)
+        self.conv1 = nn.Conv2d(
+            in_planes,
+            planes,
+            kernel_size=3,
+            stride=stride,
+            padding=1,
+            bias=False,
+        )
+
+        self.batch_norm2 = nn.BatchNorm2d(planes)
+        self.conv2 = nn.Conv2d(
+            planes,
+            planes,
+            kernel_size=3,
+            stride=1,
+            padding=1,
+            bias=False,
+        )
+
+        if stride != 1 or in_planes != planes * self.expansion:
+            self.shortcut = nn.Conv2d(
+                in_planes,
+                planes * self.expansion,
+                kernel_size=1,
+                stride=stride,
+                bias=False,
+            )
+        else:
+            self.shortcut = nn.Identity()
+
+    def forward(self, x):
+        out = F.relu(self.batch_norm1(x))
+        shortcut = self.shortcut(out) if not isinstance(self.shortcut, nn.Identity) else x
+
+        out = self.conv1(out)
+        out = F.relu(self.batch_norm2(out))
+        out = self.conv2(out)
+        out += shortcut
+        return out
