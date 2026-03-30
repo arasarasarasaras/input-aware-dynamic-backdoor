@@ -1,5 +1,5 @@
 import torch
-from generator.model import TriggerGenerator
+from models.generator import TriggerGenerator
 
 # create model
 model = TriggerGenerator(inChannels=3, outChannels=3)
